@@ -1,0 +1,171 @@
+1. Descripción del Problema
+
+Una fábrica produce 3 tipos de productos con un inventario inicial. Cada producto tiene un costo de producción y una demanda semanal estimada. Se requiere diseñar un programa que:
+
+- Calcule el total de ingresos esperados semanalmente.
+
+- Determine si el inventario es suficiente para cubrir la demanda.
+
+- Si no es suficiente, calcule la cantidad adicional que debe producirse para evitar pérdidas.
+
+- Desarrolle el diagrama de flujo de la solución del problema.
+
+- Desarrolle el diagrama UML de clases de la solución del problema.
+
+- Genere el código SQL de la base de datos.
+
+- Genere el código PHP de la solución integral del problema utilizando la arquitectura MVC.
+
+2. Solución Propuesta
+Ingresos esperados: Se calculan multiplicando la demanda semanal por el precio de venta de cada producto.
+
+Inventario suficiente: Se verifica comparando el inventario inicial con la demanda semanal.
+
+Cantidad adicional: Si el inventario no es suficiente, se calcula como Demanda - Inventario.
+
+Sistema en PHP: Se implementa usando el patrón MVC para separar la lógica de negocio (Modelo), la presentación (Vista) y el control de flujo (Controlador).
+
+3. Diagrama de Flujo
+mermaid
+flowchart TD
+    A[Inicio] --> B[Definir productos]
+    B --> C{Inventario ≥ Demanda?}
+    C -- Sí --> D[Inventario es suficiente]
+    C -- No --> E[Calcular cantidad adicional]
+    E --> F[Mostrar cantidad adicional a producir]
+    D --> G[Mostrar resultados]
+    F --> G
+    G --> H[Fin]
+
+4. Diagrama UML de Clases
+mermaid
+
+classDiagram
+    class Producto {
+        -String nombre
+        -double costoProduccion
+        +getNombre() String
+        +setNombre(String nombre) void
+        +getCostoProduccion() double
+        +setCostoProduccion(double costo) void
+    }
+
+    class Inventario {
+        -Map~Producto, int~ stock
+        +agregarProducto(Producto producto, int cantidad) void
+        +verificarDisponibilidad(Producto producto, int cantidadRequerida) boolean
+        +obtenerCantidad(Producto producto) int
+        +reducirStock(Producto producto, int cantidad) void
+    }
+
+    class Demanda {
+        -Map~Producto, int~ demandaSemanal
+        +agregarDemanda(Producto producto, int cantidad) void
+        +obtenerDemanda(Producto producto) int
+    }
+
+    class Fabrica {
+        -Inventario inventario
+        -Demanda demanda
+        +Fabrica(Inventario inventario, Demanda demanda)
+        +verificarInventario() Map~Producto, String~
+        +calcularCantidadAdicional() Map~Producto, int~
+        +producirProductos(Map~Producto, int~ cantidadAdicional) void
+    }
+
+    Producto "1" -- "1" Inventario : contiene >
+    Producto "1" -- "1" Demanda : tiene >
+    Fabrica "1" -- "1" Inventario : gestiona >
+    Fabrica "1" -- "1" Demanda : gestiona >
+
+
+5. Diagrama UML del Patrón MVC (PHP)
+mermaid
+
+classDiagram
+    class Conexion {
+        +static conectar(): PDO
+    }
+
+    class Modelo {
+        +static registro_producto_modelo(array datos, string tabla): string
+        +static actualizar_inventario_modelo(int id_producto, int cantidad, string tabla): string
+        +static obtener_productos_modelo(string tabla): array
+        +static obtener_inventario_modelo(string tabla): array
+        +static calcular_demanda_modelo(array productos): array
+    }
+
+    class Paginas {
+        +static enlaces_paginas_modelo(string enlace): string
+    }
+
+    class Controlador {
+        +static pagina(): void
+        +static enlaces_paginas_controlador(): void
+        
+        %% Métodos para Producto %%
+        +static registro_producto_controlador(): void
+        +static listar_productos_controlador(): void
+        +static editar_producto_controlador(int id): void
+        +static eliminar_producto_controlador(int id): void
+        
+        %% Métodos para Inventario %%
+        +static actualizar_inventario_controlador(): void
+        +static mostrar_inventario_controlador(): void
+        
+        %% Métodos para Demanda %%
+        +static registrar_demanda_controlador(): void
+        +static calcular_ingresos_esperados_controlador(): void
+        +static mostrar_demanda_controlador(): void
+        
+        %% Métodos para Fábrica %%
+        +static verificar_inventario_suficiente_controlador(): void
+        +static calcular_produccion_adicional_controlador(): void
+        +static mostrar_resultados_fabricacion_controlador(): void
+    }
+
+    class Alertas {
+        +static mostrar_alerta(string respuesta, array mensajes, string redireccion): void
+    }
+
+    class ProductoModelo {
+        +static registrar(array datos): string
+        +static obtener_todos(): array
+        +static obtener_por_id(int id): array
+        +static actualizar(int id, array datos): string
+        +static eliminar(int id): string
+    }
+
+    class InventarioModelo {
+        +static registrar(int id_producto, int cantidad): string
+        +static actualizar(int id_producto, int cantidad): string
+        +static obtener_por_producto(int id_producto): array
+        +static verificar_disponibilidad(int id_producto, int cantidad): bool
+    }
+
+    class DemandaModelo {
+        +static registrar(int id_producto, int cantidad): string
+        +static actualizar(int id_producto, int cantidad): string
+        +static obtener_por_producto(int id_producto): int
+        +static calcular_ingresos_esperados(array productos): float
+    }
+
+    class FabricaModelo {
+        +static verificar_inventario(array productos): array
+        +static calcular_produccion_adicional(array productos, array inventario): array
+    }
+
+    Conexion <|-- Modelo
+    Conexion <|-- Paginas
+    Modelo <|-- ProductoModelo
+    Modelo <|-- InventarioModelo
+    Modelo <|-- DemandaModelo
+    Modelo <|-- FabricaModelo
+    
+    Controlador --> Modelo : Usa >
+    Controlador --> Paginas : Usa >
+    Controlador --> Alertas : Usa >
+    Controlador --> ProductoModelo : Usa >
+    Controlador --> InventarioModelo : Usa >
+    Controlador --> DemandaModelo : Usa >
+    Controlador --> FabricaModelo : Usa >
