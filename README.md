@@ -27,48 +27,6 @@ El sistema resuelve los siguientes requerimientos:
 6. ✅ Generación del código SQL de la base de datos
 7. ✅ Generación del código en PHP de la solución integral utilizando arquitectura MVC
 
-## Instalación
-
-### Requisitos previos
-
-- PHP 7.4 o superior
-- PostgreSQL 10 o superior
-- Composer (opcional pero recomendado)
-
-### Pasos de instalación
-
-1. Clonar el repositorio:
-   ```
-   git clone https://github.com/tu-usuario/mvc-inventario-productos.git
-   cd mvc-inventario-productos
-   ```
-
-2. Instalar dependencias con Composer:
-   ```
-   composer install
-   ```
-   
-   > Si no tienes Composer instalado, puedes descargar solo el paquete necesario [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv) manualmente.
-
-3. Configurar variables de entorno:
-   - Copia el archivo `.env.example` a `.env`
-   - Edita el archivo `.env` con tus credenciales de base de datos:
-   ```
-   DB_HOST=localhost
-   DB_NAME=mvc_inventario_productos
-   DB_USER=tu_usuario
-   DB_PASSWORD=tu_contraseña
-   DB_PORT=5432
-   ```
-
-4. Importar la base de datos:
-   - Encuentra el archivo SQL en `app/models/sql/scheme_postgresql.sql`
-   - Importa el esquema en tu servidor PostgreSQL
-
-5. Configurar el servidor web:
-   - Apunta el DocumentRoot a la carpeta raíz del proyecto
-   - Asegúrate de que el mod_rewrite esté habilitado si usas Apache
-
 ## Funcionalidad
 
 ### Gestión de Demanda
@@ -159,40 +117,23 @@ static public function verificar_disponibilidad($fk_producto, $cantidad_requerid
 
 El sistema aprovecha características específicas de PostgreSQL:
 
-1. **Funciones PL/pgSQL**: Para operaciones complejas como cálculos y verificaciones
-
-   ```php
-   // Uso de funciones optimizadas de PostgreSQL cuando están disponibles
-   if (class_exists('PostgreSQLModelo')) {
-       $resultados = PostgreSQLModelo::verificar_inventario_suficiente();
-       // Formatear resultados para la vista
-   }
-   ```
-
-2. **Transacciones optimizadas**: Gestión eficiente para operaciones que afectan múltiples tablas
-
-### 3. Seguridad con Variables de Entorno
-
-El sistema utiliza variables de entorno para proteger información sensible:
+**Funciones PL/pgSQL**: Para operaciones complejas como cálculos y verificaciones
 
 ```php
-// Configuración de conexión a base de datos usando variables de entorno
-$host = $_ENV['DB_HOST'];
-$dbname = $_ENV['DB_NAME'];
-$user = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASSWORD'];
-$port = $_ENV['DB_PORT'] ?? '5432';
+// Uso de funciones optimizadas de PostgreSQL cuando están disponibles
+if (class_exists('PostgreSQLModelo')) {
+    $resultados = PostgreSQLModelo::verificar_inventario_suficiente();
+    // Formatear resultados para la vista
+}
 ```
 
-Para esto se utiliza el paquete `vlucas/phpdotenv` que permite gestionar las variables de entorno de forma segura:
+> [!INFO]
+>
+> El proyecto utiliza la siguiente dependencia:
+> **[vlucas/phpdotenv](https://github.com/vlucas/phpdotenv)**: Para gestionar variables de entorno de forma segura
 
-```php
-// Instalación con Composer
+```
 composer require vlucas/phpdotenv
-
-// Uso en la aplicación
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 ```
 
 ## Diagrama de Flujo
@@ -259,15 +200,6 @@ classDiagram
     Fabrica ..> PostgreSQLModelo : usa >
 ```
 
-## Dependencias
-
-El proyecto utiliza las siguientes dependencias:
-
-- **[vlucas/phpdotenv](https://github.com/vlucas/phpdotenv)**: Para gestionar variables de entorno de forma segura
-  ```
-  composer require vlucas/phpdotenv
-  ```
-
 > [!WARNING]
 >
 > Este proyecto es una implementación educativa. Para un entorno de producción, se recomienda implementar medidas adicionales de seguridad y optimización.
@@ -276,4 +208,4 @@ El proyecto utiliza las siguientes dependencias:
 
 <a href="https://github.com/hk4u-dxv">
   <img src="https://img.shields.io/badge/-hk4u--dxv-000000?style=for-the-badge&logo=github&labelColor=282c34"/>
-</a> 
+</a>
