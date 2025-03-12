@@ -5,7 +5,7 @@
 .DS_Store
 Thumbs.db
 
-# Carpeta de dependencias de Composer (por si en el futuro se usa)
+# Carpeta de dependencias de Composer
 /vendor/
 
 # Archivos de caché
