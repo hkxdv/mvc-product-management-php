@@ -17,13 +17,13 @@ define('ALIASES', [
 
 
     // Rutas de recursos (URLs)
-    '@img' => URL_BASE . 'public/assets/img',
-    '@js' => URL_BASE . 'public/assets/js',
-    '@css' => URL_BASE . 'public/assets/css',
-    '@fonts' => URL_BASE . 'public/assets/fonts',
+    '@img' => URL_BASE . 'assets/img',
+    '@js' => URL_BASE . 'assets/js',
+    '@css' => URL_BASE . 'assets/css',
+    '@fonts' => URL_BASE . 'assets/fonts',
 
     // Rutas de archivos (filesystem paths)
-    '@Componentes' => PATH_BASE . '/includes/componentes.php',
+    '@Componentes' => PATH_BASE . '/app/views/components/componentes.php',
     '@Menu' => PATH_BASE . '/app/views/components/menu.php',
     '@Pie_pagina' => PATH_BASE . '/app/views/components/pie_pagina.php'
 
