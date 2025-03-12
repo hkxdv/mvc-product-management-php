@@ -1,0 +1,13 @@
+# Ignorar archivos de configuración con credenciales
+.env
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Carpeta de dependencias de Composer (por si en el futuro se usa)
+/vendor/
+
+# Archivos de caché
+*.cache
+*.log 
