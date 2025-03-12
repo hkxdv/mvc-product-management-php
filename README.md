@@ -6,6 +6,7 @@ Sistema desarrollado en PHP con arquitectura MVC para administrar el inventario,
   <img src="https://img.shields.io/badge/-PHP-000000?style=for-the-badge&logo=php&labelColor=282c34"/>
   <img src="https://img.shields.io/badge/-PostgreSQL-000000?style=for-the-badge&logo=postgresql&labelColor=282c34"/>
   <img src="https://img.shields.io/badge/-XAMPP-000000?style=for-the-badge&logo=xampp&labelColor=282c34"/>
+  <img src="https://img.shields.io/badge/-Composer-000000?style=for-the-badge&logo=composer&labelColor=282c34"/>
 </div>
 
 ## Descripción
@@ -25,6 +26,48 @@ El sistema resuelve los siguientes requerimientos:
 5. ✅ Desarrollo del diagrama UML de clases de la solución del problema
 6. ✅ Generación del código SQL de la base de datos
 7. ✅ Generación del código en PHP de la solución integral utilizando arquitectura MVC
+
+## Instalación
+
+### Requisitos previos
+
+- PHP 7.4 o superior
+- PostgreSQL 10 o superior
+- Composer (opcional pero recomendado)
+
+### Pasos de instalación
+
+1. Clonar el repositorio:
+   ```
+   git clone https://github.com/tu-usuario/mvc-inventario-productos.git
+   cd mvc-inventario-productos
+   ```
+
+2. Instalar dependencias con Composer:
+   ```
+   composer install
+   ```
+   
+   > Si no tienes Composer instalado, puedes descargar solo el paquete necesario [vlucas/phpdotenv](https://github.com/vlucas/phpdotenv) manualmente.
+
+3. Configurar variables de entorno:
+   - Copia el archivo `.env.example` a `.env`
+   - Edita el archivo `.env` con tus credenciales de base de datos:
+   ```
+   DB_HOST=localhost
+   DB_NAME=mvc_inventario_productos
+   DB_USER=tu_usuario
+   DB_PASSWORD=tu_contraseña
+   DB_PORT=5432
+   ```
+
+4. Importar la base de datos:
+   - Encuentra el archivo SQL en `app/models/sql/scheme_postgresql.sql`
+   - Importa el esquema en tu servidor PostgreSQL
+
+5. Configurar el servidor web:
+   - Apunta el DocumentRoot a la carpeta raíz del proyecto
+   - Asegúrate de que el mod_rewrite esté habilitado si usas Apache
 
 ## Funcionalidad
 
@@ -70,7 +113,7 @@ El sistema implementa una base de datos con 4 tablas principales:
 3. **demanda**: Registro de la demanda semanal estimada
 4. **produccion_adicional**: Registro de las necesidades adicionales de producción
 
-> **Note**
+> [!NOTE]
 >
 > La estructura completa de la base de datos se encuentra en el archivo `app/models/sql/scheme_postgresql.sql`.
 
@@ -127,6 +170,30 @@ El sistema aprovecha características específicas de PostgreSQL:
    ```
 
 2. **Transacciones optimizadas**: Gestión eficiente para operaciones que afectan múltiples tablas
+
+### 3. Seguridad con Variables de Entorno
+
+El sistema utiliza variables de entorno para proteger información sensible:
+
+```php
+// Configuración de conexión a base de datos usando variables de entorno
+$host = $_ENV['DB_HOST'];
+$dbname = $_ENV['DB_NAME'];
+$user = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASSWORD'];
+$port = $_ENV['DB_PORT'] ?? '5432';
+```
+
+Para esto se utiliza el paquete `vlucas/phpdotenv` que permite gestionar las variables de entorno de forma segura:
+
+```php
+// Instalación con Composer
+composer require vlucas/phpdotenv
+
+// Uso en la aplicación
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+```
 
 ## Diagrama de Flujo
 
@@ -192,7 +259,16 @@ classDiagram
     Fabrica ..> PostgreSQLModelo : usa >
 ```
 
-> **Warning**
+## Dependencias
+
+El proyecto utiliza las siguientes dependencias:
+
+- **[vlucas/phpdotenv](https://github.com/vlucas/phpdotenv)**: Para gestionar variables de entorno de forma segura
+  ```
+  composer require vlucas/phpdotenv
+  ```
+
+> [!WARNING]
 >
 > Este proyecto es una implementación educativa. Para un entorno de producción, se recomienda implementar medidas adicionales de seguridad y optimización.
 
@@ -200,4 +276,4 @@ classDiagram
 
 <a href="https://github.com/hk4u-dxv">
   <img src="https://img.shields.io/badge/-hk4u--dxv-000000?style=for-the-badge&logo=github&labelColor=282c34"/>
-</a>
+</a> 
