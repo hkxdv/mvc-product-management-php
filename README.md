@@ -1,11 +1,10 @@
 # Sistema de Gestión de Inventario y Demanda
 
-Sistema desarrollado en PHP con arquitectura MVC para administrar el inventario, demanda y producción de productos en una fábrica.
+Sistema desarrollado en PHP con arquitectura MVC para administrar el inventario, demanda y producción de productos en una fábrica. Optimizado para PostgreSQL.
 
 <div align="center">
-  <img src="https://img.shields.io/badge/-MVC-000000?style=for-the-badge&logo=diagram&labelColor=282c34"/>
   <img src="https://img.shields.io/badge/-PHP-000000?style=for-the-badge&logo=php&labelColor=282c34"/>
-  <img src="https://img.shields.io/badge/-MySQL-000000?style=for-the-badge&logo=mysql&labelColor=282c34"/>
+  <img src="https://img.shields.io/badge/-PostgreSQL-000000?style=for-the-badge&logo=postgresql&labelColor=282c34"/>
   <img src="https://img.shields.io/badge/-XAMPP-000000?style=for-the-badge&logo=xampp&labelColor=282c34"/>
 </div>
 
@@ -29,57 +28,25 @@ El sistema resuelve los siguientes requerimientos:
 
 ## Funcionalidad
 
-### Gestión de Inventario
-
-Administra el stock disponible de cada producto:
-
-```php
-// Ejemplo de verificación de inventario utilizando MVC
-$disponible = InventarioModelo::verificar_disponibilidad($id_producto, $cantidad);
-$datos_inventario = InventarioModelo::obtener_por_producto($id_producto);
-$respuesta = InventarioModelo::actualizar($id_producto, $nueva_cantidad);
-
-// Desde el controlador
-Controlador::actualizar_inventario_controlador();
-Controlador::mostrar_inventario_controlador();
-```
-
-- Visualización de niveles de inventario
-- Verificación de disponibilidad de productos
-
 ### Gestión de Demanda
 
 Controla la demanda semanal estimada:
 
 ```php
 // Ejemplo de gestión de demanda utilizando MVC
-$respuesta = DemandaModelo::registrar($id_producto, $cantidad);
-$cantidadDemandada = DemandaModelo::obtener_por_producto($id_producto);
-$ingresos = DemandaModelo::calcular_ingresos_esperados($productos);
+$respuesta = DemandaModelo::registrar($fk_producto, $cantidad);
+$demanda = DemandaModelo::obtener_por_producto($fk_producto);
+$ingresos = DemandaModelo::calcular_ingresos_esperados();
 
 // Desde el controlador
 Controlador::registrar_demanda_controlador();
 Controlador::calcular_ingresos_esperados_controlador();
+Controlador::mostrar_demanda_controlador();
 ```
 
 - Registro de la demanda semanal estimada por producto
 - Cálculo de ingresos esperados basados en la demanda semanal
-
-### Cálculos y Fabricación
-
-```php
-// Ejemplo de gestión de fábrica utilizando MVC
-$estadoInventario = FabricaModelo::verificar_inventario($productos);
-$produccionAdicional = FabricaModelo::calcular_produccion_adicional($productos, $inventario);
-
-// Desde el controlador
-Controlador::verificar_inventario_suficiente_controlador();
-Controlador::calcular_produccion_adicional_controlador();
-Controlador::mostrar_resultados_fabricacion_controlador();
-```
-
-- Cálculo de producción adicional necesaria cuando el inventario es insuficiente
-- Gestión del proceso de producción adicional
+- Visualización detallada de la demanda por producto
 
 ## Modelo de Datos
 
@@ -89,10 +56,13 @@ El sistema implementa una base de datos con 4 tablas principales:
 
    ```sql
    CREATE TABLE productos (
-       pk_productos INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+       pk_productos SERIAL PRIMARY KEY NOT NULL,
        nombre VARCHAR(100) NOT NULL,
        costo_produccion DECIMAL(10,2) NOT NULL,
-       precio_venta DECIMAL(10,2) NOT NULL
+       precio_venta DECIMAL(10,2) NOT NULL,
+       hora TIME NOT NULL,
+       fecha DATE NOT NULL,
+       estado SMALLINT NOT NULL
    );
    ```
 
@@ -102,7 +72,61 @@ El sistema implementa una base de datos con 4 tablas principales:
 
 > **Note**
 >
-> La estructura completa de la base de datos se encuentra en el archivo `app/models/sql/tablas.sql`.
+> La estructura completa de la base de datos se encuentra en el archivo `app/models/sql/scheme_postgresql.sql`.
+
+## Convenciones de Nomenclatura
+
+Para mantener la consistencia y mejorar la legibilidad del código, se implementan las siguientes convenciones:
+
+1. **Llaves primarias**: Todas las llaves primarias usan el prefijo `pk_` (ej. `pk_productos`, `pk_inventario`)
+2. **Llaves foráneas**: Todas las llaves foráneas usan el prefijo `fk_` (ej. `fk_producto`)
+3. **Consultas SQL**: Se utilizan consultas optimizadas para PostgreSQL
+
+```php
+// Ejemplo de convención de nomenclatura
+$stmt = Conexion::conectar()->prepare("
+    SELECT i.*, p.nombre as nombre_producto
+    FROM inventario i
+    JOIN productos p ON i.fk_producto = p.pk_productos
+    WHERE i.estado = 1 AND p.estado = 1
+");
+```
+
+## Optimizacion
+
+### 1. Documentación Coherente
+
+Se ha implementado documentación PHPDoc completa en todos los archivos:
+
+```php
+/**
+ * Verifica si hay suficiente cantidad en inventario para un producto
+ *
+ * @param integer $fk_producto ID del producto
+ * @param integer $cantidad_requerida Cantidad que se desea verificar
+ * @return boolean true si hay cantidad suficiente, false en caso contrario
+ */
+static public function verificar_disponibilidad($fk_producto, $cantidad_requerida)
+{
+    // Implementación del método
+}
+```
+
+### 2. Optimizacion para PostgreSQL
+
+El sistema aprovecha características específicas de PostgreSQL:
+
+1. **Funciones PL/pgSQL**: Para operaciones complejas como cálculos y verificaciones
+
+   ```php
+   // Uso de funciones optimizadas de PostgreSQL cuando están disponibles
+   if (class_exists('PostgreSQLModelo')) {
+       $resultados = PostgreSQLModelo::verificar_inventario_suficiente();
+       // Formatear resultados para la vista
+   }
+   ```
+
+2. **Transacciones optimizadas**: Gestión eficiente para operaciones que afectan múltiples tablas
 
 ## Diagrama de Flujo
 
@@ -130,39 +154,42 @@ classDiagram
         -String nombre
         -double costoProduccion
         -double precioVenta
-        +getNombre() String
-        +setNombre(String nombre) void
-        +getCostoProduccion() double
-        +setCostoProduccion(double costo) void
+        +obtener_todos() array
+        +obtener_por_id(int pk_productos) array
     }
 
     class Inventario {
-        -Map~Producto, int~ stock
-        +agregarProducto(Producto producto, int cantidad) void
-        +verificarDisponibilidad(Producto producto, int cantidadRequerida) boolean
-        +obtenerCantidad(Producto producto) int
-        +reducirStock(Producto producto, int cantidad) void
+        +registrar(int fk_producto, int cantidad) string
+        +obtener_todos() array
+        +obtener_por_producto(int fk_producto) array
+        +actualizar(int fk_producto, int cantidad) string
+        +verificar_disponibilidad(int fk_producto, int cantidad) boolean
     }
 
     class Demanda {
-        -Map~Producto, int~ demandaSemanal
-        +agregarDemanda(Producto producto, int cantidad) void
-        +obtenerDemanda(Producto producto) int
+        +registrar(int fk_producto, int cantidad) string
+        +obtener_todos() array
+        +obtener_por_producto(int fk_producto) array
+        +actualizar(int fk_producto, int cantidad) string
+        +calcular_ingresos_esperados() array
     }
 
     class Fabrica {
-        -Inventario inventario
-        -Demanda demanda
-        +Fabrica(Inventario inventario, Demanda demanda)
-        +verificarInventario() Map~Producto, String~
-        +calcularCantidadAdicional() Map~Producto, int~
-        +producirProductos(Map~Producto, int~ cantidadAdicional) void
+        +verificar_inventario() array
+        +calcular_produccion_adicional() array
+    }
+
+    class PostgreSQLModelo {
+        +static calcular_ingresos_esperados() float
+        +static verificar_inventario_suficiente() array
+        +static calcular_produccion_adicional() array
     }
 
     Producto "1" -- "1" Inventario : contiene >
     Producto "1" -- "1" Demanda : tiene >
-    Fabrica "1" -- "1" Inventario : gestiona >
-    Fabrica "1" -- "1" Demanda : gestiona >
+    Fabrica ..> Inventario : utiliza >
+    Fabrica ..> Demanda : utiliza >
+    Fabrica ..> PostgreSQLModelo : usa >
 ```
 
 > **Warning**
